@@ -1,0 +1,32 @@
+Based on the project requirements, here's a detailed breakdown of what you need to do:
+
+Report: The report should include the following sections:
+
+Title, names, and surnames of team members, and a brief description of the project.
+Pseudocode of your parallel algorithm with at most 12 lines.
+A brief explanation of your parallel algorithm according to Foster’s methodology, explaining partitioning, communication, agglomeration, and mapping.
+Discussion on whether you've adopted task or data parallelism, and the reasoning behind it.
+Tables for experiments on your PC: include the elapsed time, speed-ups, and efficiencies of your parallel algorithm for different thread numbers and scheduling methods. The timings should be averaged over at least 3 tests.
+Additional tables for experiments on a 16-core server.
+Charts showing speedup for each schedule.
+Source codes: You need to write three programs:
+
+seq_main.c: This is the sequential version of your image downscaling algorithm.
+openmp_main.c: This is the parallel version of your algorithm using OpenMP. It should take the number of threads as an input and use different for loop schedules: default, static (with chunk sizes 1 and 100), dynamic (with chunk sizes 1 and 100), and guided (with chunk sizes 100 and 1000).
+hybrid_main.c: This is the hybrid version of your algorithm using both MPI and OpenMP.
+Compilation: Provide a Makefile for compiling the source codes.
+
+Hybrid Parallelism Tests: You need to test your hybrid program with different numbers of MPI processes and OpenMP threads. The total number of cores used should not exceed the number of available cores.
+
+Optimization for Heterogeneous CPU: The server has a CPU with 8 performance cores and 8 efficiency cores. You need to find a way to optimally distribute the work among these cores for maximum speed-up.
+
+Submission: Submit your report (in PDF format) and your codes in a zip file named project2-GroupX.zip, where X is your group number.
+
+Here are some additional notes on these requirements:
+
+For the report, I recommend starting with a brief introduction of the project, followed by the pseudocode and explanation of your algorithm. Make sure to clearly explain how you've implemented partitioning, communication, agglomeration, and mapping, and how you've used task or data parallelism.
+For the source codes, remember to include error handling and to correctly free any allocated memory.
+In the openmp_main.c program, you'll need to use the omp_set_num_threads function to set the number of threads, and the omp_set_schedule function to set the schedule type and chunk size.
+In the hybrid_main.c program, you'll need to use MPI functions for inter-process communication, and OpenMP functions for multi-threading within each process.
+When conducting the experiments, make sure to perform each experiment multiple times and take the average timing to account for variability in the results.
+Finally, when optimizing for the heterogeneous CPU, consider how the different cores might be best suited to different parts of the work. For example, you might want to assign the more computationally intensive tasks to the performance cores and the less intensive tasks to the efficiency cores. You'll need to experiment to find the optimal distribution.

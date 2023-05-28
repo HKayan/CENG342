@@ -1,0 +1,12 @@
+what are the outputs of the c files?
+
+
+The outputs of your C programs will be the result of the image processing operations you're conducting, specifically image resizing. Below is a breakdown of what each program does:
+
+seq_main.c: This is your sequential program. It takes two arguments, the input and output image file paths. It will read the input image, downscale it by half using a resizing algorithm, and write the result to the output image file. In addition to this, it will output the time taken for the resize operation to stdout or a log file.
+
+openmp_main.c: This is your parallel program using OpenMP. It takes three arguments: the input and output image file paths, and the number of threads to use. Similar to the sequential program, it will read the input image, downscale it using a parallel resizing algorithm, and write the result to the output image file. It will also output the time taken for the resize operation. However, this time, the processing will be done using the specified number of threads, which should make it faster for large images on a multi-core machine.
+
+hybrid_main.c: This is your hybrid program using both MPI and OpenMP. It will similarly take the input and output image file paths and the number of threads to use. However, it's expected to be run using the mpirun command, which will also specify the number of MPI processes. Like the other programs, it will read the input image, downscale it using a parallel resizing algorithm, and write the result to the output image file. It will output the time taken for the resize operation, but this time, the processing will be done using both MPI processes and OpenMP threads.
+
+Remember, the main goal of your project is not only to produce the downscaled images but to measure and compare the execution time of the sequential and parallel versions of your algorithm, with different numbers of threads and scheduling methods. This information will be used for your report and your experiments on speed-up and efficiency.

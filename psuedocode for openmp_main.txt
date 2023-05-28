@@ -1,0 +1,31 @@
+Begin
+  Parse command line arguments for input_image, output_image, and num_threads
+
+  Load input_image into memory and get its dimensions and channels
+  
+  Check if the image dimensions are divisible by 2
+  
+  Compute new dimensions for the output_image
+  
+  Allocate memory for the output_image
+
+  Set the number of threads for OpenMP to num_threads
+  
+  Start timer
+
+  # Parallel section begins
+  Begin Parallel Region
+    Call the resizing function on input_image with new dimensions, outputting to output_image
+  End Parallel Region
+  # Parallel section ends
+
+  Stop timer and compute elapsed time
+
+  Check if resizing operation was successful
+  
+  Write output_image to file
+  
+  Free allocated memory for both input_image and output_image
+  
+  Print elapsed time and success message
+End
