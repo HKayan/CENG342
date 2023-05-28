@@ -2,17 +2,34 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include <omp.h>
+#include <hwloc.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
 #include "stb_image_write.h"
 
+hwloc_topology_t topology;
+hwloc_cpuset_t set_performance[8];
+hwloc_cpuset_t set_efficiency[8];
+
+
 void downsample_image(unsigned char *input_image, unsigned char *output_image, int width, int height, int channels);
 double perform_downsampling(unsigned char *input_image, unsigned char *output_image, int width, int height, int channels, int num_threads);
 
 int main(int argc, char* argv[]) {
 
+    hwloc_topology_init(&topology);
+    hwloc_topology_load(topology);
+
+    // Allocate and set the hwloc_cpuset_t objects
+    for (int i = 0; i < 8; ++i) {
+        set_performance[i] = hwloc_bitmap_alloc();
+        hwloc_bitmap_only(set_performance[i], i);
+
+        set_efficiency[i] = hwloc_bitmap_alloc();
+        hwloc_bitmap_only(set_efficiency[i], i+8);
+    }
     // Ensure we have enough arguments
     
     // Parse the command line arguments
@@ -87,6 +104,14 @@ int main(int argc, char* argv[]) {
     free(input_block);
     free(output_block);
 
+    for (int i = 0; i < 8; ++i) {
+        hwloc_bitmap_free(set_performance[i]);
+        hwloc_bitmap_free(set_efficiency[i]);
+    }
+
+    hwloc_topology_destroy(topology);
+    
+
     MPI_Finalize();
 
     if (rank == 0) {
@@ -132,12 +157,24 @@ void downsample_image(unsigned char *input_image, unsigned char *output_image, i
 }
 
 double perform_downsampling(unsigned char *input_image, unsigned char *output_image, int width, int height, int channels, int num_threads) {
-    omp_set_num_threads(num_threads);
+    
+    omp_set_num_threads(8);
+    omp_set_schedule(omp_sched_dynamic, 1);
+    
     double start_time, end_time;
     double total_time = 0.0;
 
     #pragma omp parallel reduction(+: total_time)
     {
+        int tid = omp_get_thread_num();
+        if (tid < 8) {
+            // bind to performance core
+            hwloc_set_cpubind(topology, set_performance[tid], 0);
+        } else {
+            // bind to efficiency core
+            hwloc_set_cpubind(topology, set_efficiency[tid-8], 0);
+        }
+
         start_time = omp_get_wtime();
         downsample_image(input_image, output_image, width, height, channels);
         end_time = omp_get_wtime();
